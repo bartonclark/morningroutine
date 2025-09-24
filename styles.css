@@ -441,21 +441,23 @@ body {
 /* Caffeine Timer */
 .caffeine-timer {
     text-align: center;
-    padding: 20px;
-    background: rgba(135, 206, 235, 0.1);
+    padding: 16px;
+    background: rgba(241, 196, 15, 0.1);
     border-radius: 12px;
-    margin-top: 20px;
+    margin-top: 16px;
+    border-left: 4px solid var(--morning-gold);
 }
 
 .caffeine-timer p {
     font-weight: 600;
-    margin-bottom: 12px;
-    color: var(--shadow-gray);
+    margin-bottom: 8px;
+    color: #2C3E50;
 }
 
 .caffeine-timer small {
-    color: #666;
+    color: #34495E;
     font-style: italic;
+    font-size: 12px;
 }
 
 /* Light Exposure */
@@ -931,14 +933,14 @@ body {
 /* Morning Priorities Display */
 .priorities-card {
     border: 2px solid var(--morning-gold);
-    background: linear-gradient(135deg, rgba(241, 196, 15, 0.1), rgba(241, 196, 15, 0.05));
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
 }
 
 .morning-priorities-intro {
     text-align: center;
     margin-bottom: 20px;
     padding: 16px;
-    background: rgba(241, 196, 15, 0.1);
+    background: rgba(52, 73, 94, 0.05);
     border-radius: 12px;
     border-left: 4px solid var(--morning-gold);
 }
@@ -1006,8 +1008,8 @@ body {
 
 .priority-text {
     font-size: 16px;
-    font-weight: 500;
-    color: var(--shadow-gray);
+    font-weight: 600;
+    color: #2C3E50;
     margin-bottom: 4px;
     line-height: 1.3;
 }
@@ -1017,7 +1019,7 @@ body {
     align-items: center;
     gap: 12px;
     font-size: 12px;
-    color: #666;
+    color: #34495E;
 }
 
 .priority-category-badge {
@@ -1269,6 +1271,610 @@ body {
 .sleep-quality-prediction small {
     color: #666;
     font-style: italic;
+}
+
+/* Personal Challenges Tab */
+.challenges-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.challenges-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #E74C3C, #C0392B);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+}
+
+.challenges-header p {
+    color: #666;
+    font-size: 16px;
+    font-style: italic;
+}
+
+/* Resistance Assessment Onboarding */
+.challenges-onboarding {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.onboarding-header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding: 24px;
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(192, 57, 43, 0.05));
+    border-radius: 16px;
+    border: 2px solid #E74C3C;
+}
+
+.onboarding-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #E74C3C;
+    margin-bottom: 16px;
+}
+
+.onboarding-header p {
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--shadow-gray);
+}
+
+.resistance-assessment {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+}
+
+.assessment-progress {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.assessment-question {
+    padding: 24px;
+}
+
+.activity-card {
+    margin-bottom: 24px;
+}
+
+.activity-category {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #E74C3C;
+    color: white;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+}
+
+.activity-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--shadow-gray);
+    margin-bottom: 8px;
+    line-height: 1.3;
+}
+
+.activity-description {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.4;
+    margin-bottom: 24px;
+}
+
+.resistance-scale {
+    margin-bottom: 24px;
+}
+
+.resistance-scale label {
+    display: block;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--shadow-gray);
+}
+
+.scale-container {
+    background: rgba(231, 76, 60, 0.05);
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(231, 76, 60, 0.2);
+}
+
+.scale-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #666;
+}
+
+.resistance-buttons {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+}
+
+.resistance-btn {
+    width: 36px;
+    height: 36px;
+    border: 2px solid #E8E8E8;
+    border-radius: 50%;
+    background: white;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.resistance-btn:hover {
+    border-color: #E74C3C;
+    background: rgba(231, 76, 60, 0.1);
+}
+
+.resistance-btn.selected {
+    border-color: #E74C3C;
+    background: #E74C3C;
+    color: white;
+    transform: scale(1.1);
+}
+
+.frequency-check label {
+    display: block;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--shadow-gray);
+}
+
+.frequency-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.frequency-btn {
+    padding: 12px 16px;
+    border: 2px solid #E8E8E8;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.frequency-btn:hover {
+    border-color: #E74C3C;
+    background: rgba(231, 76, 60, 0.1);
+}
+
+.frequency-btn.selected {
+    border-color: #E74C3C;
+    background: #E74C3C;
+    color: white;
+}
+
+.assessment-complete {
+    padding: 40px 24px;
+    text-align: center;
+}
+
+.completion-celebration h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #E74C3C;
+    margin-bottom: 12px;
+}
+
+.completion-celebration p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+/* Resistance Profile Dashboard */
+.resistance-profile-card {
+    border: 2px solid #E74C3C;
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.05), rgba(231, 76, 60, 0.02));
+}
+
+.resistance-heatmap {
+    margin-bottom: 20px;
+}
+
+.heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.resistance-category {
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #E8E8E8;
+    transition: var(--transition);
+}
+
+.resistance-category.high {
+    background: linear-gradient(135deg, #E74C3C, #C0392B);
+    color: white;
+    border-color: #E74C3C;
+}
+
+.resistance-category.medium {
+    background: linear-gradient(135deg, #F39C12, #E67E22);
+    color: white;
+    border-color: #F39C12;
+}
+
+.resistance-category.low {
+    background: linear-gradient(135deg, #27AE60, #2ECC71);
+    color: white;
+    border-color: #27AE60;
+}
+
+.category-name {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.category-score {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.resistance-insights {
+    padding: 16px;
+    background: rgba(231, 76, 60, 0.05);
+    border-radius: 12px;
+    border-left: 4px solid #E74C3C;
+}
+
+.resistance-insights h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #E74C3C;
+    margin-bottom: 12px;
+}
+
+.insight-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.insight-item {
+    font-size: 14px;
+    color: var(--shadow-gray);
+    line-height: 1.4;
+    padding-left: 16px;
+    position: relative;
+}
+
+.insight-item::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #E74C3C;
+    font-weight: bold;
+}
+
+/* Personal Challenges List */
+.personal-challenges-list {
+    margin-bottom: 24px;
+}
+
+.personal-challenge-item {
+    background: white;
+    border: 2px solid #E8E8E8;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: var(--transition);
+    position: relative;
+}
+
+.personal-challenge-item:hover {
+    border-color: #E74C3C;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
+}
+
+.personal-challenge-item.completed {
+    border-color: var(--success-green);
+    background: rgba(39, 174, 96, 0.05);
+}
+
+.challenge-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.challenge-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #E74C3C;
+    margin-top: 2px;
+}
+
+.challenge-info {
+    flex: 1;
+}
+
+.challenge-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--shadow-gray);
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+
+.challenge-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.challenge-category-badge {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 11px;
+    background: rgba(231, 76, 60, 0.1);
+    color: #E74C3C;
+}
+
+.challenge-resistance-level {
+    font-weight: 600;
+    color: #E74C3C;
+}
+
+.challenge-rationale {
+    font-size: 13px;
+    color: #666;
+    font-style: italic;
+    line-height: 1.3;
+}
+
+.personal-completion-celebration {
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(39, 174, 96, 0.1);
+    border-radius: 8px;
+    border-left: 4px solid var(--success-green);
+    display: none;
+}
+
+.personal-completion-celebration.show {
+    display: block;
+}
+
+.personal-completion-celebration p {
+    font-size: 14px;
+    color: var(--success-green);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.personal-completion-celebration small {
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+}
+
+.challenge-generation {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+/* Evolution Metrics */
+.evolution-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.evolution-metric {
+    text-align: center;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    border: 2px solid #E8E8E8;
+}
+
+.evolution-metric h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.evolution-metric .metric-value {
+    font-size: 20px;
+    font-weight: 800;
+    color: #E74C3C;
+    margin-bottom: 4px;
+}
+
+.evolution-metric small {
+    font-size: 12px;
+    color: #999;
+}
+
+/* Context Inputs */
+.context-inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.context-input label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--shadow-gray);
+}
+
+.context-input select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid #E8E8E8;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: var(--transition);
+}
+
+.context-input select:focus {
+    outline: none;
+    border-color: #E74C3C;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+.contextual-suggestions {
+    margin-top: 20px;
+}
+
+.contextual-challenge {
+    padding: 12px 16px;
+    background: rgba(231, 76, 60, 0.05);
+    border-radius: 8px;
+    border-left: 4px solid #E74C3C;
+    margin-bottom: 12px;
+}
+
+.contextual-challenge h5 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #E74C3C;
+    margin-bottom: 4px;
+}
+
+.contextual-challenge p {
+    font-size: 13px;
+    color: var(--shadow-gray);
+    line-height: 1.4;
+}
+
+/* Friction Patterns */
+.friction-patterns {
+    margin-bottom: 20px;
+}
+
+.pattern-insight {
+    padding: 12px 16px;
+    background: rgba(135, 206, 235, 0.1);
+    border-radius: 8px;
+    border-left: 4px solid var(--gentle-blue);
+    margin-bottom: 12px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.false-positive-alerts {
+    margin-bottom: 20px;
+}
+
+.false-positive-alert {
+    padding: 12px 16px;
+    background: rgba(241, 196, 15, 0.1);
+    border-radius: 8px;
+    border-left: 4px solid var(--morning-gold);
+    margin-bottom: 12px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.correlation-insights {
+    margin-bottom: 20px;
+}
+
+.correlation-insight {
+    padding: 12px 16px;
+    background: rgba(39, 174, 96, 0.1);
+    border-radius: 8px;
+    border-left: 4px solid var(--success-green);
+    margin-bottom: 12px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* Mobile Responsive for Challenges */
+@media (max-width: 480px) {
+    .resistance-buttons {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    
+    .resistance-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+    
+    .frequency-options {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .heatmap-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    
+    .evolution-metrics {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .context-inputs {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .challenge-generation {
+        flex-direction: column;
+    }
+    
+    .nav-tabs {
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    .nav-tab {
+        min-width: 80px;
+    }
 }
 
 /* Analytics */

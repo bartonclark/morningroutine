@@ -32,6 +32,7 @@
         <nav class="nav-tabs">
             <button class="nav-tab active" data-tab="routine">Routine</button>
             <button class="nav-tab" data-tab="sleep">Sleep Prep</button>
+            <button class="nav-tab" data-tab="challenges">Challenges</button>
             <button class="nav-tab" data-tab="analytics">Analytics</button>
             <button class="nav-tab" data-tab="settings">Settings</button>
         </nav>
@@ -155,9 +156,8 @@
                             </div>
                         </div>
                         <div class="caffeine-timer" id="caffeineTimer" style="display: none;">
-                            <p>⏰ Caffeine delay timer:</p>
-                            <div class="timer-display" id="caffeineCountdown">90:00</div>
-                            <small>Optimal caffeine timing: 90-120 minutes after wake</small>
+                            <div class="timer-display" id="caffeineCountdown" style="font-size: 16px; font-weight: 600; color: #2C3E50;">☕ Optimal caffeine time: 8:30 AM</div>
+                            <small>Huberman recommends waiting 90-120 minutes after wake for optimal adenosine management</small>
                         </div>
                     </div>
                 </div>
@@ -325,8 +325,8 @@
                                         <option value="creative">🎨 Creative</option>
                                         <option value="relationships">❤️ Relationships</option>
                                         <option value="learning">📚 Learning</option>
-                                    </select>
-                                </div>
+                </select>
+            </div>
                                 <div class="time-estimation">
                                     <label>Estimated time needed:</label>
                                     <div class="time-slider-container">
@@ -356,7 +356,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+        </div>
 
                 <!-- Evening Checklist -->
                 <div class="routine-card">
@@ -400,6 +400,218 @@
                             <h4>Sleep Quality Prediction</h4>
                             <div class="quality-score" id="qualityScore">85%</div>
                             <small>Based on preparation completion</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal Challenges Tab -->
+            <div id="challenges-tab" class="tab-content">
+                <!-- Onboarding Check -->
+                <div class="challenges-onboarding" id="challengesOnboarding" style="display: none;">
+                    <div class="onboarding-header">
+                        <h2>🧠 Discover Your Personal Resistance Profile</h2>
+                        <p>True AMCC training requires understanding what YOU specifically resist. This isn't about generic "hard tasks" - it's about YOUR unique friction patterns.</p>
+                    </div>
+
+                    <div class="resistance-assessment">
+                        <div class="assessment-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="assessmentProgress"></div>
+                            </div>
+                            <span class="progress-text" id="assessmentProgressText">0/50 Activities Rated</span>
+                        </div>
+
+                        <div class="assessment-question" id="assessmentQuestion">
+                            <div class="activity-card">
+                                <div class="activity-category" id="activityCategory">Organization</div>
+                                <h3 class="activity-title" id="activityTitle">Organize your desk completely</h3>
+                                <p class="activity-description" id="activityDescription">Clear everything off, wipe down, organize supplies, file papers properly</p>
+                                
+                                <div class="resistance-scale">
+                                    <label>How much do you resist this activity?</label>
+                                    <div class="scale-container">
+                                        <div class="scale-labels">
+                                            <span>Love it</span>
+                                            <span>Hate it</span>
+                                        </div>
+                                        <div class="resistance-buttons">
+                                            <button class="resistance-btn" data-score="1">1</button>
+                                            <button class="resistance-btn" data-score="2">2</button>
+                                            <button class="resistance-btn" data-score="3">3</button>
+                                            <button class="resistance-btn" data-score="4">4</button>
+                                            <button class="resistance-btn" data-score="5">5</button>
+                                            <button class="resistance-btn" data-score="6">6</button>
+                                            <button class="resistance-btn" data-score="7">7</button>
+                                            <button class="resistance-btn" data-score="8">8</button>
+                                            <button class="resistance-btn" data-score="9">9</button>
+                                            <button class="resistance-btn" data-score="10">10</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="frequency-check">
+                                    <label>How often do you avoid/postpone this?</label>
+                                    <div class="frequency-options">
+                                        <button class="frequency-btn" data-frequency="never">Never avoid</button>
+                                        <button class="frequency-btn" data-frequency="sometimes">Sometimes</button>
+                                        <button class="frequency-btn" data-frequency="often">Often avoid</button>
+                                        <button class="frequency-btn" data-frequency="always">Always avoid</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="action-btn" id="submitAssessment" disabled>Submit Rating</button>
+                        </div>
+
+                        <div class="assessment-complete" id="assessmentComplete" style="display: none;">
+                            <div class="completion-celebration">
+                                <span class="celebration-icon">🎯</span>
+                                <h3>Your Personal Resistance Profile Complete!</h3>
+                                <p>We've analyzed your unique friction patterns. Ready to see your personalized AMCC training challenges?</p>
+                                <button class="action-btn" id="viewProfile">View Your Resistance Profile</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Challenges Interface -->
+                <div class="challenges-main" id="challengesMain">
+                    <div class="challenges-header">
+                        <h2>Personal AMCC Training</h2>
+                        <p>Based on YOUR unique resistance patterns</p>
+                    </div>
+
+                    <!-- Resistance Profile Dashboard -->
+                    <div class="routine-card resistance-profile-card">
+                        <div class="card-header">
+                            <h3>🔥 Your Resistance Profile</h3>
+                            <button class="action-btn secondary" id="retakeAssessment">Update Profile</button>
+                        </div>
+                        <div class="card-content">
+                            <div class="resistance-heatmap" id="resistanceHeatmap">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                            <div class="resistance-insights" id="resistanceInsights">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Today's Personal Challenges -->
+                    <div class="routine-card challenges-card">
+                        <div class="card-header">
+                            <h3>Today's Personal Challenges</h3>
+                            <small>Based on your avoidance patterns</small>
+                        </div>
+                        <div class="card-content">
+                            <div class="challenge-intro" id="challengeIntro">
+                                <p><strong>These are specifically chosen because YOU resist them.</strong></p>
+                                <small>Complete any challenge to strengthen your AMCC and willpower muscle.</small>
+                            </div>
+                            
+                            <div class="personal-challenges-list" id="personalChallengesList">
+                                <!-- Will be populated by JavaScript based on resistance profile -->
+                            </div>
+                            
+                            <div class="challenge-generation">
+                                <button class="action-btn secondary" id="generateNewChallenges">Generate New Challenges</button>
+                                <button class="action-btn secondary" id="adaptDifficulty">Adapt Difficulty</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resistance Evolution Tracking -->
+                    <div class="routine-card evolution-card">
+                        <div class="card-header">
+                            <h3>📈 Resistance Evolution</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="evolution-metrics">
+                                <div class="evolution-metric">
+                                    <h4>Strongest Resistance</h4>
+                                    <div class="metric-value" id="strongestResistance">Organization</div>
+                                    <small>Current challenge area</small>
+                                </div>
+                                <div class="evolution-metric">
+                                    <h4>Biggest Improvement</h4>
+                                    <div class="metric-value" id="biggestImprovement">Social</div>
+                                    <small>-40% resistance</small>
+                                </div>
+                                <div class="evolution-metric">
+                                    <h4>AMCC Strength</h4>
+                                    <div class="metric-value" id="amccStrength">73%</div>
+                                    <small>overall willpower</small>
+                                </div>
+                            </div>
+                            
+                            <div class="resistance-decay-chart">
+                                <h4>Personal Resistance Patterns</h4>
+                                <canvas id="resistanceChart" width="300" height="150"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Context-Aware Suggestions -->
+                    <div class="routine-card context-card">
+                        <div class="card-header">
+                            <h3>🎯 Smart Suggestions</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="context-factors">
+                                <div class="context-inputs">
+                                    <div class="context-input">
+                                        <label>Current Energy Level:</label>
+                                        <select id="energyLevel">
+                                            <option value="high">High Energy</option>
+                                            <option value="medium" selected>Medium Energy</option>
+                                            <option value="low">Low Energy</option>
+                                        </select>
+                                    </div>
+                                    <div class="context-input">
+                                        <label>Available Time:</label>
+                                        <select id="availableTime">
+                                            <option value="5">5 minutes</option>
+                                            <option value="15" selected>15 minutes</option>
+                                            <option value="30">30 minutes</option>
+                                            <option value="60">1 hour</option>
+                                        </select>
+                                    </div>
+                                    <div class="context-input">
+                                        <label>Current Location:</label>
+                                        <select id="currentLocation">
+                                            <option value="home" selected>Home</option>
+                                            <option value="office">Office</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button class="action-btn" id="getContextualChallenges">Get Contextual Challenges</button>
+                            </div>
+                            
+                            <div class="contextual-suggestions" id="contextualSuggestions">
+                                <!-- Will be populated based on context -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Personal Friction Insights -->
+                    <div class="routine-card insights-card">
+                        <div class="card-header">
+                            <h3>🧬 Personal Friction Insights</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="friction-patterns" id="frictionPatterns">
+                                <!-- Will show personalized patterns like "You avoid social tasks most on Mondays" -->
+                            </div>
+                            
+                            <div class="false-positive-alerts" id="falsePositiveAlerts">
+                                <!-- Will flag activities user claimed to resist but actually enjoys -->
+                            </div>
+                            
+                            <div class="correlation-insights" id="correlationInsights">
+                                <!-- Will show how challenge completion affects routine success -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -478,10 +690,10 @@
                             <h4>📊 Your Priority Patterns</h4>
                             <div class="pattern-list" id="priorityPatterns">
                                 <!-- Will be populated by JavaScript -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            </div>
+            </div>
+            </div>
+        </div>
 
                 <!-- Insights -->
                 <div class="routine-card">
@@ -508,7 +720,7 @@
             <div id="settings-tab" class="tab-content">
                 <div class="settings-header">
                     <h2>Settings & Customization</h2>
-                </div>
+        </div>
 
                 <!-- Personal Info -->
                 <div class="routine-card">
@@ -534,8 +746,8 @@
                             <label for="location">Location (for weather):</label>
                             <input type="text" id="location" placeholder="City, State or ZIP">
                         </div>
-                    </div>
-                </div>
+            </div>
+        </div>
 
                 <!-- Notification Settings -->
                 <div class="routine-card">
@@ -559,7 +771,7 @@
                             Streak milestone celebrations
                         </label>
                     </div>
-                </div>
+        </div>
 
                 <!-- Data Management -->
                 <div class="routine-card">
@@ -588,7 +800,7 @@
                 </div>
                 <div class="modal-actions">
                     <button class="action-btn" id="modalClose">Continue</button>
-                </div>
+            </div>
             </div>
         </div>
     </div>

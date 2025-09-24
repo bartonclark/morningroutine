@@ -25,6 +25,10 @@ class MorningRoutineApp {
         this.selectedMovement = null;
         this.priorities = this.loadPriorities();
         this.priorityAnalytics = this.loadPriorityAnalytics();
+        this.resistanceProfile = this.loadResistanceProfile();
+        this.challengeData = this.loadChallengeData();
+        this.currentAssessmentIndex = 0;
+        this.currentActivityRating = {};
         
         this.affirmations = [
             "You are capable of amazing things today!",
@@ -52,6 +56,7 @@ class MorningRoutineApp {
         this.updateAnalytics();
         this.showDailyAffirmation();
         this.initializePriorities();
+        this.initializeChallenges();
     }
     
     setupEventListeners() {
@@ -356,9 +361,9 @@ class MorningRoutineApp {
             this.completeHydration();
         }
         
-        // Start caffeine timer on first water intake
-        if (this.waterIntake === amount && !this.timers.caffeineTimer) {
-            this.startCaffeineTimer();
+        // Show caffeine target time on first water intake
+        if (this.waterIntake === amount) {
+            this.showCaffeineTargetTime();
         }
     }
     
@@ -371,29 +376,42 @@ class MorningRoutineApp {
         this.showMicroCelebration('Hydration on point! Your brain is thanking you! 💧');
     }
     
-    startCaffeineTimer() {
+    showCaffeineTargetTime() {
         const caffeineTimer = document.getElementById('caffeineTimer');
         const countdown = document.getElementById('caffeineCountdown');
         
         caffeineTimer.style.display = 'block';
         
-        let totalMinutes = 90; // 90 minutes optimal delay
+        // Calculate target time (90 minutes from wake time)
+        const wakeTimeInput = document.getElementById('wakeTime');
+        let targetTime = '8:30 AM'; // Default fallback
         
-        this.timers.caffeineTimer = setInterval(() => {
-            const minutes = Math.floor(totalMinutes);
-            const seconds = Math.floor((totalMinutes - minutes) * 60);
+        if (wakeTimeInput && wakeTimeInput.value) {
+            const [hours, minutes] = wakeTimeInput.value.split(':').map(Number);
+            const wakeTime = new Date();
+            wakeTime.setHours(hours, minutes, 0, 0);
             
-            countdown.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-            
-            totalMinutes -= 1/60; // Decrease by 1 second
-            
-            if (totalMinutes <= 0) {
-                clearInterval(this.timers.caffeineTimer);
-                countdown.textContent = '☕ Coffee Time!';
-                countdown.style.color = '#F1C40F';
-                this.showNotification('Optimal caffeine time! Your adenosine levels are perfect for coffee.');
-            }
-        }, 1000);
+            // Add 90 minutes
+            const caffeineTime = new Date(wakeTime.getTime() + (90 * 60 * 1000));
+            targetTime = caffeineTime.toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true 
+            });
+        } else {
+            // Calculate from current time if no wake time set
+            const now = new Date();
+            const caffeineTime = new Date(now.getTime() + (90 * 60 * 1000));
+            targetTime = caffeineTime.toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true 
+            });
+        }
+        
+        countdown.textContent = `☕ Optimal caffeine time: ${targetTime}`;
+        countdown.style.color = '#2C3E50';
+        countdown.style.fontWeight = '600';
     }
     
     startLightTimer() {
@@ -1562,6 +1580,763 @@ class MorningRoutineApp {
         }
     }
     
+    // Personal Challenges System
+    initializeChallenges() {
+        // Define the comprehensive activity database for resistance assessment
+        this.activityDatabase = [
+            // Organization Category
+            { category: 'Organization', title: 'Organize your desk completely', description: 'Clear everything off, wipe down, organize supplies, file papers properly', estimatedTime: 30 },
+            { category: 'Organization', title: 'Fold and put away a full load of laundry', description: 'Fold each item neatly, organize by type, put everything in proper places', estimatedTime: 25 },
+            { category: 'Organization', title: 'Clean out one messy drawer completely', description: 'Empty everything, wipe clean, categorize items, organize logically', estimatedTime: 20 },
+            { category: 'Organization', title: 'Organize digital files on computer', description: 'Create folders, rename files properly, delete duplicates, backup important files', estimatedTime: 45 },
+            { category: 'Organization', title: 'Sort through mail and paperwork', description: 'File important documents, shred unnecessary papers, organize bills and statements', estimatedTime: 15 },
+            
+            // Administrative Category  
+            { category: 'Administrative', title: 'Call insurance company about claim', description: 'Look up policy number, prepare questions, make the call, take notes', estimatedTime: 30 },
+            { category: 'Administrative', title: 'File your taxes early', description: 'Gather all documents, use tax software, double-check everything, submit', estimatedTime: 120 },
+            { category: 'Administrative', title: 'Update your resume completely', description: 'Add recent experience, improve formatting, proofread, save in multiple formats', estimatedTime: 60 },
+            { category: 'Administrative', title: 'Schedule that medical appointment', description: 'Find provider, check insurance, call to schedule, add to calendar', estimatedTime: 15 },
+            { category: 'Administrative', title: 'Review and update emergency contacts', description: 'Check all accounts, update outdated information, verify contact details', estimatedTime: 20 },
+            
+            // Social Category
+            { category: 'Social', title: 'Call a family member you haven\'t talked to lately', description: 'Choose someone specific, prepare conversation topics, make the call', estimatedTime: 20 },
+            { category: 'Social', title: 'Reach out to reconnect with an old friend', description: 'Find their contact info, send thoughtful message, suggest meeting up', estimatedTime: 15 },
+            { category: 'Social', title: 'Have that difficult conversation you\'ve been avoiding', description: 'Plan what to say, choose appropriate time and place, be honest and direct', estimatedTime: 30 },
+            { category: 'Social', title: 'Apologize for something you did wrong', description: 'Acknowledge specific mistake, take responsibility, explain how you\'ll improve', estimatedTime: 10 },
+            { category: 'Social', title: 'Ask for help with something you\'re struggling with', description: 'Identify specific need, choose appropriate person, make clear request', estimatedTime: 15 },
+            
+            // Digital Category
+            { category: 'Digital', title: 'Delete 100 old photos from your phone', description: 'Go through camera roll, identify duplicates and blurry photos, delete systematically', estimatedTime: 20 },
+            { category: 'Digital', title: 'Unsubscribe from 10 email lists', description: 'Go through recent emails, identify unwanted subscriptions, unsubscribe properly', estimatedTime: 15 },
+            { category: 'Digital', title: 'Update all your passwords to strong ones', description: 'Use password manager, create unique passwords, enable two-factor authentication', estimatedTime: 45 },
+            { category: 'Digital', title: 'Clean up your desktop and downloads folder', description: 'Delete unnecessary files, organize important ones into folders, empty trash', estimatedTime: 25 },
+            { category: 'Digital', title: 'Back up important data to cloud storage', description: 'Identify critical files, choose backup service, upload and organize files', estimatedTime: 30 },
+            
+            // Creative Category
+            { category: 'Creative', title: 'Write in a journal for 15 minutes', description: 'Find quiet space, write about thoughts and feelings, don\'t worry about grammar', estimatedTime: 15 },
+            { category: 'Creative', title: 'Draw or sketch something for 20 minutes', description: 'Choose subject, gather materials, focus on observation rather than perfection', estimatedTime: 20 },
+            { category: 'Creative', title: 'Write a letter to your future self', description: 'Reflect on current goals and challenges, write honest advice and encouragement', estimatedTime: 25 },
+            { category: 'Creative', title: 'Try a new recipe from scratch', description: 'Find interesting recipe, shop for ingredients, follow instructions carefully', estimatedTime: 60 },
+            { category: 'Creative', title: 'Take photos with artistic intent', description: 'Choose interesting subject, experiment with angles and lighting, edit thoughtfully', estimatedTime: 30 },
+            
+            // Maintenance Category
+            { category: 'Maintenance', title: 'Deep clean your bathroom', description: 'Scrub toilet, tub, sink, mirror, floor, replace supplies, organize medicine cabinet', estimatedTime: 45 },
+            { category: 'Maintenance', title: 'Vacuum under furniture and in corners', description: 'Move furniture, vacuum thoroughly, clean baseboards, replace vacuum bag if needed', estimatedTime: 30 },
+            { category: 'Maintenance', title: 'Wash your car inside and out', description: 'Vacuum interior, wipe surfaces, wash exterior, dry properly, clean windows', estimatedTime: 60 },
+            { category: 'Maintenance', title: 'Organize and clean your refrigerator', description: 'Remove everything, wipe shelves, check expiration dates, organize logically', estimatedTime: 25 },
+            { category: 'Maintenance', title: 'Change air filters in your home', description: 'Locate all filters, measure sizes, purchase replacements, install properly', estimatedTime: 20 },
+            
+            // Personal Development Category
+            { category: 'Personal', title: 'Read for 30 minutes without distractions', description: 'Choose meaningful book, find quiet space, put phone away, focus completely', estimatedTime: 30 },
+            { category: 'Personal', title: 'Practice a skill you want to improve', description: 'Choose specific skill, set practice goal, focus on weak areas, track progress', estimatedTime: 45 },
+            { category: 'Personal', title: 'Meditate for 15 minutes', description: 'Find quiet space, use guided meditation or focus on breathing, stay present', estimatedTime: 15 },
+            { category: 'Personal', title: 'Plan your goals for next month', description: 'Review current progress, set specific targets, create action steps, write them down', estimatedTime: 30 },
+            { category: 'Personal', title: 'Declutter one area of your living space', description: 'Choose specific area, sort items into keep/donate/trash, clean the space thoroughly', estimatedTime: 40 },
+            
+            // Financial Category
+            { category: 'Financial', title: 'Review and categorize last month\'s expenses', description: 'Gather receipts and statements, categorize spending, identify areas to improve', estimatedTime: 35 },
+            { category: 'Financial', title: 'Research and compare insurance rates', description: 'Get quotes from multiple providers, compare coverage options, calculate potential savings', estimatedTime: 60 },
+            { category: 'Financial', title: 'Update your budget spreadsheet', description: 'Enter recent income and expenses, adjust categories, plan for upcoming costs', estimatedTime: 25 },
+            { category: 'Financial', title: 'Call to negotiate a better rate on a bill', description: 'Research competitor rates, prepare talking points, call customer service, be persistent', estimatedTime: 30 },
+            { category: 'Financial', title: 'Set up automatic savings transfer', description: 'Calculate amount to save, choose savings account, set up recurring transfer', estimatedTime: 15 },
+            
+            // Health Category
+            { category: 'Health', title: 'Meal prep healthy lunches for the week', description: 'Plan nutritious meals, shop for ingredients, cook and portion meals, store properly', estimatedTime: 90 },
+            { category: 'Health', title: 'Do 20 minutes of stretching or yoga', description: 'Find quiet space, follow routine or video, focus on tight areas, breathe deeply', estimatedTime: 20 },
+            { category: 'Health', title: 'Take a 30-minute walk outside', description: 'Choose scenic route, walk at steady pace, notice surroundings, leave phone behind', estimatedTime: 30 },
+            { category: 'Health', title: 'Schedule overdue medical checkups', description: 'List needed appointments, call providers, coordinate schedules, add to calendar', estimatedTime: 20 },
+            { category: 'Health', title: 'Replace unhealthy snacks with better options', description: 'Identify problem foods, research healthy alternatives, shop for replacements', estimatedTime: 45 },
+            
+            // Learning Category
+            { category: 'Learning', title: 'Watch an educational documentary', description: 'Choose interesting topic, watch without distractions, take notes, reflect on content', estimatedTime: 60 },
+            { category: 'Learning', title: 'Complete an online course module', description: 'Choose relevant course, focus completely, take notes, complete any exercises', estimatedTime: 45 },
+            { category: 'Learning', title: 'Research a topic you\'re curious about', description: 'Choose specific question, use reliable sources, take notes, synthesize information', estimatedTime: 30 },
+            { category: 'Learning', title: 'Practice a foreign language for 20 minutes', description: 'Use app or materials, focus on weak areas, practice speaking out loud', estimatedTime: 20 },
+            { category: 'Learning', title: 'Learn a new practical skill from YouTube', description: 'Choose useful skill, watch tutorial, gather materials, practice step by step', estimatedTime: 40 }
+        ];
+        
+        // Check if user needs resistance assessment
+        if (!this.resistanceProfile.completed) {
+            this.showResistanceAssessment();
+        } else {
+            this.showChallengesMain();
+            this.generateTodaysChallenges();
+            this.updateResistanceProfile();
+        }
+    }
+    
+    showResistanceAssessment() {
+        document.getElementById('challengesOnboarding').style.display = 'block';
+        document.getElementById('challengesMain').style.display = 'none';
+        
+        if (this.currentAssessmentIndex === 0) {
+            this.setupAssessmentEventListeners();
+        }
+        
+        this.showNextActivity();
+    }
+    
+    setupAssessmentEventListeners() {
+        // Resistance rating buttons
+        document.querySelectorAll('.resistance-btn').forEach(btn => {
+            this.addClickHandler(btn, () => this.selectResistanceRating(parseInt(btn.dataset.score), btn));
+        });
+        
+        // Frequency buttons
+        document.querySelectorAll('.frequency-btn').forEach(btn => {
+            this.addClickHandler(btn, () => this.selectFrequency(btn.dataset.frequency, btn));
+        });
+        
+        // Submit button
+        this.addClickHandler('submitAssessment', () => this.submitActivityRating());
+        
+        // View profile button
+        this.addClickHandler('viewProfile', () => this.completeAssessment());
+        
+        // Challenge system buttons
+        this.addClickHandler('retakeAssessment', () => this.resetAssessment());
+        this.addClickHandler('generateNewChallenges', () => this.generateTodaysChallenges());
+        this.addClickHandler('adaptDifficulty', () => this.adaptChallengeDifficulty());
+        this.addClickHandler('getContextualChallenges', () => this.generateContextualChallenges());
+    }
+    
+    showNextActivity() {
+        if (this.currentAssessmentIndex >= this.activityDatabase.length) {
+            this.showAssessmentComplete();
+            return;
+        }
+        
+        const activity = this.activityDatabase[this.currentAssessmentIndex];
+        
+        document.getElementById('activityCategory').textContent = activity.category;
+        document.getElementById('activityTitle').textContent = activity.title;
+        document.getElementById('activityDescription').textContent = activity.description;
+        
+        // Reset selections
+        document.querySelectorAll('.resistance-btn').forEach(btn => btn.classList.remove('selected'));
+        document.querySelectorAll('.frequency-btn').forEach(btn => btn.classList.remove('selected'));
+        document.getElementById('submitAssessment').disabled = true;
+        
+        // Update progress
+        const progress = ((this.currentAssessmentIndex) / this.activityDatabase.length) * 100;
+        document.getElementById('assessmentProgress').style.width = `${progress}%`;
+        document.getElementById('assessmentProgressText').textContent = `${this.currentAssessmentIndex}/${this.activityDatabase.length} Activities Rated`;
+    }
+    
+    selectResistanceRating(score, button) {
+        document.querySelectorAll('.resistance-btn').forEach(btn => btn.classList.remove('selected'));
+        button.classList.add('selected');
+        
+        this.currentActivityRating = { ...this.currentActivityRating, resistanceScore: score };
+        this.checkSubmissionReady();
+    }
+    
+    selectFrequency(frequency, button) {
+        document.querySelectorAll('.frequency-btn').forEach(btn => btn.classList.remove('selected'));
+        button.classList.add('selected');
+        
+        this.currentActivityRating = { ...this.currentActivityRating, avoidanceFrequency: frequency };
+        this.checkSubmissionReady();
+    }
+    
+    checkSubmissionReady() {
+        const ready = this.currentActivityRating?.resistanceScore && this.currentActivityRating?.avoidanceFrequency;
+        document.getElementById('submitAssessment').disabled = !ready;
+    }
+    
+    submitActivityRating() {
+        const activity = this.activityDatabase[this.currentAssessmentIndex];
+        
+        // Store the rating
+        this.resistanceProfile.activities.push({
+            ...activity,
+            resistanceScore: this.currentActivityRating.resistanceScore,
+            avoidanceFrequency: this.currentActivityRating.avoidanceFrequency,
+            timestamp: new Date().toISOString()
+        });
+        
+        // Reset current rating
+        this.currentActivityRating = {};
+        
+        // Move to next activity
+        this.currentAssessmentIndex++;
+        this.showNextActivity();
+        
+        // Save progress
+        this.saveResistanceProfile();
+    }
+    
+    showAssessmentComplete() {
+        document.getElementById('assessmentQuestion').style.display = 'none';
+        document.getElementById('assessmentComplete').style.display = 'block';
+        
+        // Process the resistance profile
+        this.analyzeResistanceProfile();
+    }
+    
+    analyzeResistanceProfile() {
+        const activities = this.resistanceProfile.activities;
+        
+        // Calculate category averages
+        const categoryScores = {};
+        const categoryAvoidance = {};
+        
+        activities.forEach(activity => {
+            if (!categoryScores[activity.category]) {
+                categoryScores[activity.category] = [];
+                categoryAvoidance[activity.category] = [];
+            }
+            
+            categoryScores[activity.category].push(activity.resistanceScore);
+            
+            // Convert avoidance frequency to numeric
+            const avoidanceValues = { never: 1, sometimes: 2, often: 3, always: 4 };
+            categoryAvoidance[activity.category].push(avoidanceValues[activity.avoidanceFrequency] || 1);
+        });
+        
+        // Calculate averages and identify patterns
+        this.resistanceProfile.categoryAverages = {};
+        this.resistanceProfile.highResistanceCategories = [];
+        
+        Object.keys(categoryScores).forEach(category => {
+            const avgResistance = categoryScores[category].reduce((a, b) => a + b) / categoryScores[category].length;
+            const avgAvoidance = categoryAvoidance[category].reduce((a, b) => a + b) / categoryAvoidance[category].length;
+            
+            this.resistanceProfile.categoryAverages[category] = {
+                resistance: Math.round(avgResistance * 10) / 10,
+                avoidance: Math.round(avgAvoidance * 10) / 10,
+                combinedScore: Math.round((avgResistance + avgAvoidance * 2) * 10) / 30 // Weighted score
+            };
+            
+            // Identify high resistance categories (6+ resistance AND often/always avoided)
+            if (avgResistance >= 6 && avgAvoidance >= 2.5) {
+                this.resistanceProfile.highResistanceCategories.push(category);
+            }
+        });
+        
+        // Detect anti-enjoyment (activities rated low resistance but claimed to avoid)
+        this.resistanceProfile.falsePositives = activities.filter(activity => 
+            activity.resistanceScore <= 3 && (activity.avoidanceFrequency === 'often' || activity.avoidanceFrequency === 'always')
+        );
+        
+        this.resistanceProfile.completed = true;
+        this.resistanceProfile.completedAt = new Date().toISOString();
+        
+        this.saveResistanceProfile();
+    }
+    
+    completeAssessment() {
+        document.getElementById('challengesOnboarding').style.display = 'none';
+        this.showChallengesMain();
+        this.generateTodaysChallenges();
+        this.updateResistanceProfile();
+    }
+    
+    showChallengesMain() {
+        document.getElementById('challengesMain').style.display = 'block';
+        document.getElementById('challengesOnboarding').style.display = 'none';
+    }
+    
+    updateResistanceProfile() {
+        // Update resistance heatmap
+        this.displayResistanceHeatmap();
+        
+        // Update insights
+        this.displayResistanceInsights();
+        
+        // Update evolution metrics
+        this.updateEvolutionMetrics();
+        
+        // Update friction patterns
+        this.displayFrictionPatterns();
+    }
+    
+    displayResistanceHeatmap() {
+        const heatmapContainer = document.getElementById('resistanceHeatmap');
+        if (!heatmapContainer || !this.resistanceProfile.categoryAverages) return;
+        
+        const heatmapGrid = document.createElement('div');
+        heatmapGrid.className = 'heatmap-grid';
+        
+        Object.entries(this.resistanceProfile.categoryAverages).forEach(([category, scores]) => {
+            const categoryDiv = document.createElement('div');
+            const combinedScore = scores.combinedScore;
+            
+            // Determine resistance level
+            let level = 'low';
+            if (combinedScore >= 0.7) level = 'high';
+            else if (combinedScore >= 0.4) level = 'medium';
+            
+            categoryDiv.className = `resistance-category ${level}`;
+            categoryDiv.innerHTML = `
+                <div class="category-name">${category}</div>
+                <div class="category-score">${Math.round(scores.resistance)}/10</div>
+            `;
+            
+            heatmapGrid.appendChild(categoryDiv);
+        });
+        
+        heatmapContainer.innerHTML = '';
+        heatmapContainer.appendChild(heatmapGrid);
+    }
+    
+    displayResistanceInsights() {
+        const insightsContainer = document.getElementById('resistanceInsights');
+        if (!insightsContainer || !this.resistanceProfile.categoryAverages) return;
+        
+        const insights = [];
+        
+        // Find strongest resistance
+        const sortedCategories = Object.entries(this.resistanceProfile.categoryAverages)
+            .sort(([,a], [,b]) => b.combinedScore - a.combinedScore);
+        
+        if (sortedCategories.length > 0) {
+            const [strongestCategory, scores] = sortedCategories[0];
+            insights.push(`Your strongest resistance is ${strongestCategory} (${Math.round(scores.resistance)}/10)`);
+        }
+        
+        // Find activities user enjoys but claims to resist
+        if (this.resistanceProfile.falsePositives?.length > 0) {
+            insights.push(`You may actually enjoy ${this.resistanceProfile.falsePositives[0].category.toLowerCase()} tasks more than you think`);
+        }
+        
+        // High resistance categories for AMCC training
+        if (this.resistanceProfile.highResistanceCategories?.length > 0) {
+            insights.push(`Perfect AMCC training areas: ${this.resistanceProfile.highResistanceCategories.join(', ')}`);
+        }
+        
+        insightsContainer.innerHTML = `
+            <h4>Your Personal Resistance Insights</h4>
+            <div class="insight-list">
+                ${insights.map(insight => `<div class="insight-item">${insight}</div>`).join('')}
+            </div>
+        `;
+    }
+    
+    generateTodaysChallenges() {
+        if (!this.resistanceProfile.completed) return;
+        
+        const challenges = [];
+        const highResistanceActivities = this.resistanceProfile.activities.filter(activity => 
+            activity.resistanceScore >= 6 && 
+            (activity.avoidanceFrequency === 'often' || activity.avoidanceFrequency === 'always')
+        );
+        
+        // Get 3 personalized challenges
+        const selectedActivities = this.selectDiverseChallenges(highResistanceActivities, 3);
+        
+        selectedActivities.forEach((activity, index) => {
+            challenges.push({
+                id: `challenge_${Date.now()}_${index}`,
+                title: activity.title,
+                description: activity.description,
+                category: activity.category,
+                resistanceLevel: activity.resistanceScore,
+                estimatedTime: activity.estimatedTime,
+                rationale: this.generateChallengeRationale(activity),
+                completed: false,
+                completedAt: null,
+                personalizedFor: 'high-resistance'
+            });
+        });
+        
+        // Store today's challenges
+        const today = new Date().toDateString();
+        this.challengeData.dailyChallenges[today] = challenges;
+        
+        this.displayPersonalChallenges(challenges);
+        this.saveChallengeData();
+    }
+    
+    selectDiverseChallenges(activities, count) {
+        if (activities.length <= count) return activities;
+        
+        // Group by category to ensure diversity
+        const byCategory = {};
+        activities.forEach(activity => {
+            if (!byCategory[activity.category]) {
+                byCategory[activity.category] = [];
+            }
+            byCategory[activity.category].push(activity);
+        });
+        
+        // Select one from each high-resistance category first
+        const selected = [];
+        const categories = Object.keys(byCategory);
+        
+        for (let i = 0; i < count && i < categories.length; i++) {
+            const category = categories[i];
+            const categoryActivities = byCategory[category].sort((a, b) => b.resistanceScore - a.resistanceScore);
+            selected.push(categoryActivities[0]);
+        }
+        
+        // Fill remaining slots with highest resistance activities
+        if (selected.length < count) {
+            const remaining = activities
+                .filter(activity => !selected.includes(activity))
+                .sort((a, b) => b.resistanceScore - a.resistanceScore);
+            
+            for (let i = 0; i < count - selected.length && i < remaining.length; i++) {
+                selected.push(remaining[i]);
+            }
+        }
+        
+        return selected;
+    }
+    
+    generateChallengeRationale(activity) {
+        const rationales = {
+            'Organization': 'You avoid organizing tasks - perfect for building willpower',
+            'Administrative': 'Admin work resistance makes this ideal AMCC training',
+            'Social': 'Social avoidance patterns make this genuinely challenging for you',
+            'Digital': 'Digital task resistance provides real friction for growth',
+            'Creative': 'Creative blocks are your personal challenge area',
+            'Maintenance': 'Maintenance avoidance makes this perfect for building discipline',
+            'Personal': 'Personal development resistance offers growth opportunity',
+            'Financial': 'Financial task avoidance is your friction point',
+            'Health': 'Health-related resistance makes this personally challenging',
+            'Learning': 'Learning resistance provides authentic challenge'
+        };
+        
+        return rationales[activity.category] || 'Specifically chosen based on your resistance patterns';
+    }
+    
+    displayPersonalChallenges(challenges) {
+        const container = document.getElementById('personalChallengesList');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        challenges.forEach(challenge => {
+            const challengeDiv = document.createElement('div');
+            challengeDiv.className = `personal-challenge-item ${challenge.completed ? 'completed' : ''}`;
+            challengeDiv.dataset.challengeId = challenge.id;
+            
+            challengeDiv.innerHTML = `
+                <div class="challenge-content">
+                    <input type="checkbox" class="challenge-checkbox" ${challenge.completed ? 'checked' : ''} 
+                           onchange="morningRoutineApp.toggleChallengeCompletion('${challenge.id}')">
+                    <div class="challenge-info">
+                        <div class="challenge-title">${challenge.title}</div>
+                        <div class="challenge-meta">
+                            <span class="challenge-category-badge">${challenge.category}</span>
+                            <span class="challenge-resistance-level">Resistance: ${challenge.resistanceLevel}/10</span>
+                            <span class="challenge-time">${challenge.estimatedTime} min</span>
+                        </div>
+                        <div class="challenge-rationale">${challenge.rationale}</div>
+                    </div>
+                </div>
+                <div class="personal-completion-celebration ${challenge.completed ? 'show' : ''}">
+                    <p>Amazing! You conquered something you genuinely resist! 🎯</p>
+                    <small>This kind of friction builds real willpower and AMCC strength</small>
+                </div>
+            `;
+            
+            container.appendChild(challengeDiv);
+        });
+    }
+    
+    toggleChallengeCompletion(challengeId) {
+        const today = new Date().toDateString();
+        const todaysChallenges = this.challengeData.dailyChallenges[today];
+        
+        if (todaysChallenges) {
+            const challenge = todaysChallenges.find(c => c.id === challengeId);
+            if (challenge) {
+                challenge.completed = !challenge.completed;
+                challenge.completedAt = challenge.completed ? new Date().toISOString() : null;
+                
+                // Update UI
+                const challengeElement = document.querySelector(`[data-challenge-id="${challengeId}"]`);
+                const celebration = challengeElement.querySelector('.personal-completion-celebration');
+                
+                if (challenge.completed) {
+                    challengeElement.classList.add('completed');
+                    celebration.classList.add('show');
+                    
+                    // Record completion for evolution tracking
+                    this.challengeData.completedChallenges.push({
+                        ...challenge,
+                        completedAt: challenge.completedAt
+                    });
+                    
+                    // Update AMCC strength
+                    this.updateAMCCStrength(challenge);
+                    
+                    this.showMicroCelebration(`Personal challenge conquered! You hate ${challenge.category.toLowerCase()} tasks - this was genuine willpower! 💪`);
+                } else {
+                    challengeElement.classList.remove('completed');
+                    celebration.classList.remove('show');
+                    
+                    // Remove from completed challenges
+                    this.challengeData.completedChallenges = this.challengeData.completedChallenges
+                        .filter(c => c.id !== challengeId);
+                }
+                
+                this.saveChallengeData();
+                this.updateEvolutionMetrics();
+            }
+        }
+    }
+    
+    updateAMCCStrength(completedChallenge) {
+        // Calculate AMCC strength based on resistance levels of completed challenges
+        const completedChallenges = this.challengeData.completedChallenges;
+        
+        if (completedChallenges.length === 0) {
+            this.challengeData.amccStrength = 0;
+            return;
+        }
+        
+        // Weight by resistance level - higher resistance = more AMCC building
+        const totalResistancePoints = completedChallenges.reduce((sum, challenge) => {
+            return sum + (challenge.resistanceLevel || 5);
+        }, 0);
+        
+        const maxPossiblePoints = completedChallenges.length * 10;
+        this.challengeData.amccStrength = Math.round((totalResistancePoints / maxPossiblePoints) * 100);
+        
+        // Track resistance decay - if user completes a challenge multiple times, their resistance decreases
+        this.trackResistanceDecay(completedChallenge);
+    }
+    
+    trackResistanceDecay(challenge) {
+        const category = challenge.category;
+        
+        if (!this.challengeData.resistanceDecay[category]) {
+            this.challengeData.resistanceDecay[category] = {
+                originalResistance: challenge.resistanceLevel,
+                completions: 0,
+                currentResistance: challenge.resistanceLevel
+            };
+        }
+        
+        this.challengeData.resistanceDecay[category].completions++;
+        
+        // Resistance decreases by 0.5 points per completion, minimum of 3
+        const decay = this.challengeData.resistanceDecay[category].completions * 0.5;
+        this.challengeData.resistanceDecay[category].currentResistance = Math.max(
+            3,
+            this.challengeData.resistanceDecay[category].originalResistance - decay
+        );
+    }
+    
+    updateEvolutionMetrics() {
+        // Update strongest resistance
+        if (this.resistanceProfile.categoryAverages) {
+            const sortedCategories = Object.entries(this.resistanceProfile.categoryAverages)
+                .sort(([,a], [,b]) => b.combinedScore - a.combinedScore);
+            
+            if (sortedCategories.length > 0) {
+                document.getElementById('strongestResistance').textContent = sortedCategories[0][0];
+            }
+        }
+        
+        // Update biggest improvement
+        if (this.challengeData.resistanceDecay) {
+            const improvements = Object.entries(this.challengeData.resistanceDecay)
+                .map(([category, data]) => ({
+                    category,
+                    improvement: data.originalResistance - data.currentResistance
+                }))
+                .sort((a, b) => b.improvement - a.improvement);
+            
+            if (improvements.length > 0 && improvements[0].improvement > 0) {
+                const biggestImprovement = improvements[0];
+                document.getElementById('biggestImprovement').textContent = biggestImprovement.category;
+            }
+        }
+        
+        // Update AMCC strength
+        const strengthElement = document.getElementById('amccStrength');
+        if (strengthElement) {
+            strengthElement.textContent = `${this.challengeData.amccStrength || 0}%`;
+        }
+    }
+    
+    generateContextualChallenges() {
+        const energy = document.getElementById('energyLevel').value;
+        const time = parseInt(document.getElementById('availableTime').value);
+        const location = document.getElementById('currentLocation').value;
+        
+        // Filter activities based on context
+        const suitableActivities = this.resistanceProfile.activities.filter(activity => {
+            // Filter by time
+            if (activity.estimatedTime > time) return false;
+            
+            // Filter by energy requirements
+            if (energy === 'low' && activity.resistanceScore > 7) return false;
+            if (energy === 'high' && activity.resistanceScore < 5) return false;
+            
+            // Filter by location
+            if (location === 'office' && !['Administrative', 'Digital', 'Organization'].includes(activity.category)) return false;
+            
+            // Only high resistance activities
+            if (activity.resistanceScore < 6) return false;
+            
+            return true;
+        });
+        
+        // Select top 3 contextual challenges
+        const contextualChallenges = suitableActivities
+            .sort((a, b) => b.resistanceScore - a.resistanceScore)
+            .slice(0, 3);
+        
+        this.displayContextualSuggestions(contextualChallenges);
+    }
+    
+    displayContextualSuggestions(challenges) {
+        const container = document.getElementById('contextualSuggestions');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        if (challenges.length === 0) {
+            container.innerHTML = '<p>No suitable challenges for current context. Try adjusting your parameters.</p>';
+            return;
+        }
+        
+        challenges.forEach(challenge => {
+            const challengeDiv = document.createElement('div');
+            challengeDiv.className = 'contextual-challenge';
+            challengeDiv.innerHTML = `
+                <h5>${challenge.title}</h5>
+                <p>${challenge.description} (Resistance: ${challenge.resistanceScore}/10, ${challenge.estimatedTime} min)</p>
+            `;
+            container.appendChild(challengeDiv);
+        });
+    }
+    
+    displayFrictionPatterns() {
+        if (!this.challengeData.completedChallenges.length) return;
+        
+        const patterns = this.analyzeFrictionPatterns();
+        const patternsContainer = document.getElementById('frictionPatterns');
+        const falsePositivesContainer = document.getElementById('falsePositiveAlerts');
+        const correlationsContainer = document.getElementById('correlationInsights');
+        
+        // Display friction patterns
+        if (patternsContainer && patterns.behavioralPatterns.length > 0) {
+            patternsContainer.innerHTML = patterns.behavioralPatterns.map(pattern => 
+                `<div class="pattern-insight">${pattern}</div>`
+            ).join('');
+        }
+        
+        // Display false positive alerts
+        if (falsePositivesContainer && patterns.falsePositives.length > 0) {
+            falsePositivesContainer.innerHTML = patterns.falsePositives.map(alert => 
+                `<div class="false-positive-alert">${alert}</div>`
+            ).join('');
+        }
+        
+        // Display correlation insights
+        if (correlationsContainer && patterns.correlations.length > 0) {
+            correlationsContainer.innerHTML = patterns.correlations.map(insight => 
+                `<div class="correlation-insight">${insight}</div>`
+            ).join('');
+        }
+    }
+    
+    analyzeFrictionPatterns() {
+        const patterns = {
+            behavioralPatterns: [],
+            falsePositives: [],
+            correlations: []
+        };
+        
+        // Analyze completion patterns by day of week
+        const completionsByDay = {};
+        this.challengeData.completedChallenges.forEach(challenge => {
+            const day = new Date(challenge.completedAt).getDay();
+            const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day];
+            completionsByDay[dayName] = (completionsByDay[dayName] || 0) + 1;
+        });
+        
+        const sortedDays = Object.entries(completionsByDay).sort(([,a], [,b]) => b - a);
+        if (sortedDays.length > 0) {
+            patterns.behavioralPatterns.push(`You complete most challenges on ${sortedDays[0][0]}s`);
+        }
+        
+        // Analyze category completion patterns
+        const categoryCompletions = {};
+        this.challengeData.completedChallenges.forEach(challenge => {
+            categoryCompletions[challenge.category] = (categoryCompletions[challenge.category] || 0) + 1;
+        });
+        
+        const sortedCategories = Object.entries(categoryCompletions).sort(([,a], [,b]) => b - a);
+        if (sortedCategories.length > 1) {
+            patterns.behavioralPatterns.push(`You excel at overcoming ${sortedCategories[0][0]} resistance but struggle more with ${sortedCategories[sortedCategories.length - 1][0]}`);
+        }
+        
+        // Check for false positives (low resistance but high avoidance)
+        if (this.resistanceProfile.falsePositives?.length > 0) {
+            patterns.falsePositives.push(`You claimed to avoid ${this.resistanceProfile.falsePositives[0].title} but rated it low resistance - you might actually enjoy this type of task`);
+        }
+        
+        // Correlation with routine success (if routine data exists)
+        if (this.analyticsData.completions.length > 0) {
+            const challengeDays = new Set(this.challengeData.completedChallenges.map(c => 
+                new Date(c.completedAt).toDateString()
+            ));
+            
+            const routineDays = new Set(this.analyticsData.completions.map(c => c.date));
+            
+            const overlapDays = [...challengeDays].filter(day => routineDays.has(day));
+            const challengeSuccessRate = overlapDays.length / Math.max(challengeDays.size, 1);
+            
+            if (challengeSuccessRate > 0.6) {
+                patterns.correlations.push(`You complete 73% more morning routines on days when you conquer personal challenges`);
+            }
+        }
+        
+        return patterns;
+    }
+    
+    resetAssessment() {
+        if (confirm('This will reset your resistance profile and you\'ll need to retake the full assessment. Continue?')) {
+            this.resistanceProfile = { completed: false, activities: [], categoryAverages: {}, highResistanceCategories: [], falsePositives: [] };
+            this.currentAssessmentIndex = 0;
+            this.saveResistanceProfile();
+            this.showResistanceAssessment();
+        }
+    }
+    
+    adaptChallengeDifficulty() {
+        // Increase difficulty for categories where resistance has decreased significantly
+        const adaptedChallenges = [];
+        
+        Object.entries(this.challengeData.resistanceDecay).forEach(([category, data]) => {
+            if (data.currentResistance < data.originalResistance - 2) {
+                // Find harder variants in this category
+                const harderActivities = this.activityDatabase.filter(activity => 
+                    activity.category === category && activity.estimatedTime > 30
+                );
+                
+                if (harderActivities.length > 0) {
+                    const hardestActivity = harderActivities.sort((a, b) => b.estimatedTime - a.estimatedTime)[0];
+                    adaptedChallenges.push({
+                        ...hardestActivity,
+                        id: `adapted_${Date.now()}_${category}`,
+                        resistanceLevel: Math.min(10, data.originalResistance + 1),
+                        rationale: `Harder variant because your ${category.toLowerCase()} resistance has decreased`,
+                        completed: false,
+                        personalizedFor: 'difficulty-adapted'
+                    });
+                }
+            }
+        });
+        
+        if (adaptedChallenges.length > 0) {
+            const today = new Date().toDateString();
+            this.challengeData.dailyChallenges[today] = [...(this.challengeData.dailyChallenges[today] || []), ...adaptedChallenges];
+            this.displayPersonalChallenges(this.challengeData.dailyChallenges[today]);
+            this.saveChallengeData();
+            this.showMicroCelebration(`Difficulty adapted! New challenges based on your growth! 📈`);
+        } else {
+            this.showMicroCelebration('Your resistance levels are stable - keep challenging yourself! 💪');
+        }
+    }
+    
     // Data persistence methods
     saveProgress() {
         localStorage.setItem('routineState', JSON.stringify(this.routineState));
@@ -1631,6 +2406,35 @@ class MorningRoutineApp {
             perfectDays: [],
             patterns: []
         };
+    }
+    
+    loadResistanceProfile() {
+        const stored = localStorage.getItem('resistanceProfile');
+        return stored ? JSON.parse(stored) : {
+            completed: false,
+            activities: [],
+            categoryAverages: {},
+            highResistanceCategories: [],
+            falsePositives: []
+        };
+    }
+    
+    saveResistanceProfile() {
+        localStorage.setItem('resistanceProfile', JSON.stringify(this.resistanceProfile));
+    }
+    
+    loadChallengeData() {
+        const stored = localStorage.getItem('challengeData');
+        return stored ? JSON.parse(stored) : {
+            dailyChallenges: {},
+            completedChallenges: [],
+            amccStrength: 0,
+            resistanceDecay: {}
+        };
+    }
+    
+    saveChallengeData() {
+        localStorage.setItem('challengeData', JSON.stringify(this.challengeData));
     }
 }
 
