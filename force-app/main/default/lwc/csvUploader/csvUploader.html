@@ -1,0 +1,88 @@
+<template>
+    <lightning-card title="CSV File Manager" icon-name="utility:upload">
+        <div class="slds-p-horizontal_medium">
+            
+            <!-- File Upload Section -->
+            <div class="slds-grid slds-gutters slds-wrap">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                    <lightning-input 
+                        type="file" 
+                        label="Upload New CSV File"
+                        accept=".csv"
+                        onchange={handleFileChange}
+                        disabled={isLoading}>
+                    </lightning-input>
+                </div>
+                
+                <!-- Existing Files Dropdown -->
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2" if:true={hasFiles}>
+                    <lightning-combobox
+                        name="fileSelect"
+                        label="Or Select Existing CSV File"
+                        value={selectedFileId}
+                        placeholder="Choose a file..."
+                        options={fileOptions}
+                        onchange={handleFileSelect}
+                        disabled={isLoading}>
+                    </lightning-combobox>
+                </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div if:true={isLoading} class="slds-p-vertical_medium">
+                <lightning-spinner alternative-text="Processing..." size="medium"></lightning-spinner>
+                <p class="slds-text-align_center slds-p-top_small">Processing CSV file...</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="slds-p-vertical_medium">
+                <lightning-button
+                    label="Refresh Files"
+                    onclick={handleRefresh}
+                    variant="neutral"
+                    disabled={isLoading}>
+                </lightning-button>
+            </div>
+
+            <!-- CSV Data Display -->
+            <template if:true={showData}>
+                <div class="slds-p-vertical_medium">
+                    <div class="slds-grid slds-grid_align-spread slds-p-bottom_small">
+                        <h3 class="slds-text-heading_small">
+                            Data from: {currentFileName}
+                        </h3>
+                        <span class="slds-badge slds-badge_lightest">
+                            {csvData.length} rows
+                        </span>
+                    </div>
+                    
+                    <div class="csv-table-container">
+                        <lightning-datatable
+                            key-field="Id"
+                            data={csvData}
+                            columns={columns}
+                            hide-checkbox-column="true"
+                            show-row-number-column="true"
+                            max-row-selection="0"
+                            resize-column-disabled="false"
+                            min-column-width="120"
+                            default-sort-direction="asc">
+                        </lightning-datatable>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Empty State -->
+            <template if:false={hasFiles}>
+                <div class="slds-p-vertical_large slds-text-align_center">
+                    <lightning-icon icon-name="utility:upload" size="large" class="slds-p-bottom_small"></lightning-icon>
+                    <h3 class="slds-text-heading_medium slds-p-bottom_small">No CSV files uploaded yet</h3>
+                    <p class="slds-text-body_regular slds-text-color_weak">
+                        Upload a CSV file to get started
+                    </p>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>
+

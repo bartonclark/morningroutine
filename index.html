@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morning Routine Tracker - Neuroscience & Psychology Based</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FF6B35">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Optimize your morning routine with neuroscience-based protocols and behavioral psychology">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Morning Routine">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="logo">🌅 Morning Mastery</h1>
+                <div class="current-streak">
+                    <span class="streak-number" id="currentStreak">0</span>
+                    <span class="streak-label">Day Streak</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="routine">Routine</button>
+            <button class="nav-tab" data-tab="sleep">Sleep Prep</button>
+            <button class="nav-tab" data-tab="analytics">Analytics</button>
+            <button class="nav-tab" data-tab="settings">Settings</button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Routine Tab -->
+            <div id="routine-tab" class="tab-content active">
+                <div class="routine-header">
+                    <h2>The Million Dollar Morning</h2>
+                    <div class="completion-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="routineProgress"></div>
+                        </div>
+                        <span class="progress-text" id="progressText">0/6 Complete</span>
+                    </div>
+                </div>
+
+                <!-- Yesterday's Priorities Display -->
+                <div class="routine-card priorities-card" id="morningPriorities" style="display: none;">
+                    <div class="card-header">
+                        <h3>Your Top 3 Priorities Today</h3>
+                        <small>Set yesterday evening for optimal focus</small>
+                    </div>
+                    <div class="card-content">
+                        <div class="morning-priorities-intro">
+                            <p><strong>Yesterday evening, you decided these were most important...</strong></p>
+                            <small>Tackle these during your Phase One work blocks (0-8 hours post-wake)</small>
+                        </div>
+                        
+                        <div class="priority-list" id="morningPriorityList">
+                            <!-- Priorities will be populated by JavaScript -->
+                        </div>
+                        
+                        <div class="priority-reorder-hint" style="display: none;">
+                            <small>💡 Drag and drop to reorder if priorities have changed</small>
+                        </div>
+                        
+                        <div class="all-priorities-complete" id="allPrioritiesComplete" style="display: none;">
+                            <div class="completion-celebration">
+                                <span class="celebration-icon">🎉</span>
+                                <h4>All Priorities Complete!</h4>
+                                <p>You're having an incredibly productive day!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5-4-3-2-1 Counter -->
+                <div class="routine-card" id="countdown-card">
+                    <div class="card-header">
+                        <h3>1. Immediate Wake Response</h3>
+                        <div class="status-indicator" id="countdown-status"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="countdown-display" id="countdownDisplay">5</div>
+                        <button class="action-btn countdown-btn" id="startCountdown">
+                            Start 5-4-3-2-1 Counter
+                        </button>
+                        <div class="timer-display" id="timeToAction" style="display: none;">
+                            Time to action: <span id="actionTime">0</span>s
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bed Making -->
+                <div class="routine-card" id="bedmaking-card">
+                    <div class="card-header">
+                        <h3>2. Bed Making Confirmation</h3>
+                        <div class="status-indicator" id="bedmaking-status"></div>
+                    </div>
+                    <div class="card-content">
+                        <button class="action-btn" id="bedMadeBtn">✅ Bed Made</button>
+                        <div class="streak-info">
+                            <span>Bed Making Streak: </span>
+                            <span id="bedStreak">0</span> days
+                        </div>
+                    </div>
+                </div>
+
+                <!-- High-Five Habit -->
+                <div class="routine-card" id="highfive-card">
+                    <div class="card-header">
+                        <h3>3. High-Five Habit Mirror</h3>
+                        <div class="status-indicator" id="highfive-status"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="affirmation-section">
+                            <p class="affirmation" id="dailyAffirmation">You are capable of amazing things today!</p>
+                            <button class="action-btn" id="newAffirmation">New Affirmation</button>
+                        </div>
+                        <div class="mood-section">
+                            <label>How do you feel right now?</label>
+                            <div class="mood-buttons">
+                                <button class="mood-btn" data-mood="energized">🚀 Energized</button>
+                                <button class="mood-btn" data-mood="calm">😌 Calm</button>
+                                <button class="mood-btn" data-mood="motivated">💪 Motivated</button>
+                                <button class="mood-btn" data-mood="tired">😴 Tired</button>
+                            </div>
+                        </div>
+                        <button class="action-btn" id="highFiveBtn">Give Yourself a High-Five! 🙌</button>
+                    </div>
+                </div>
+
+                <!-- Hydration Protocol -->
+                <div class="routine-card" id="hydration-card">
+                    <div class="card-header">
+                        <h3>4. Hydration Protocol</h3>
+                        <div class="status-indicator" id="hydration-status"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="hydration-tracker">
+                            <div class="water-goal">
+                                <span>Target: 16-32oz</span>
+                                <div class="water-amount" id="waterAmount">0oz</div>
+                            </div>
+                            <div class="water-buttons">
+                                <button class="water-btn" data-amount="8">+8oz</button>
+                                <button class="water-btn" data-amount="16">+16oz</button>
+                                <button class="water-btn" data-amount="32">+32oz</button>
+                            </div>
+                        </div>
+                        <div class="caffeine-timer" id="caffeineTimer" style="display: none;">
+                            <p>⏰ Caffeine delay timer:</p>
+                            <div class="timer-display" id="caffeineCountdown">90:00</div>
+                            <small>Optimal caffeine timing: 90-120 minutes after wake</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Light Exposure -->
+                <div class="routine-card" id="light-card">
+                    <div class="card-header">
+                        <h3>5. Light Exposure Optimizer</h3>
+                        <div class="status-indicator" id="light-status"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="light-info">
+                            <div class="weather-info" id="weatherInfo">
+                                <span>☀️ Loading weather...</span>
+                            </div>
+                            <div class="recommended-duration" id="lightDuration">
+                                Recommended: 10-15 minutes
+                            </div>
+                        </div>
+                        <div class="light-timer">
+                            <div class="timer-display" id="lightTimerDisplay">00:00</div>
+                            <div class="timer-controls">
+                                <button class="action-btn" id="startLightTimer">Start Light Timer</button>
+                                <button class="action-btn secondary" id="stopLightTimer" style="display: none;">Complete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Movement & Mindfulness -->
+                <div class="routine-card" id="movement-card">
+                    <div class="card-header">
+                        <h3>6. Movement & Mindfulness</h3>
+                        <div class="status-indicator" id="movement-status"></div>
+                    </div>
+                    <div class="card-content">
+                        <div class="movement-options">
+                            <h4>Body Movement (Choose One):</h4>
+                            <div class="option-buttons">
+                                <button class="option-btn" data-movement="walk">🚶 10-Min Walk</button>
+                                <button class="option-btn" data-movement="indoor">🏠 Indoor Exercise</button>
+                                <button class="option-btn" data-movement="stretch">🧘 Stretching</button>
+                            </div>
+                        </div>
+                        <div class="mindfulness-section">
+                            <h4>Mind Movement:</h4>
+                            <div class="gratitude-journal">
+                                <label for="gratitudeInput">What are you grateful for today?</label>
+                                <textarea id="gratitudeInput" placeholder="I'm grateful for..."></textarea>
+                            </div>
+                            <div class="intention-setting">
+                                <label for="intentionInput">What's your intention for today?</label>
+                                <textarea id="intentionInput" placeholder="Today I will..."></textarea>
+                            </div>
+                        </div>
+                        <button class="action-btn" id="completeMovement">Complete Movement & Mindfulness</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sleep Prep Tab -->
+            <div id="sleep-tab" class="tab-content">
+                <div class="sleep-header">
+                    <h2>Evening Sleep Preparation</h2>
+                    <p>Optimize tomorrow's routine with tonight's preparation</p>
+                </div>
+
+                <!-- Bedtime Calculator -->
+                <div class="routine-card">
+                    <div class="card-header">
+                        <h3>Bedtime Calculator</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="bedtime-calc">
+                            <label for="wakeTime">Desired wake time:</label>
+                            <input type="time" id="wakeTime" value="06:00">
+                            <div class="bedtime-result">
+                                <strong>Recommended bedtime: <span id="bedtimeResult">21:00</span></strong>
+                                <small>Based on 9-hour sleep window</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tomorrow's Top 3 Priorities -->
+                <div class="routine-card">
+                    <div class="card-header">
+                        <h3>Tomorrow's Top 3 Priorities</h3>
+                        <div class="priorities-completion" id="prioritiesCompletion">0/3</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="priorities-intro">
+                            <p>Set tomorrow up for success by identifying your 3 most important priorities.</p>
+                            <small>Research shows evening planning increases next-day productivity by 25%</small>
+                        </div>
+                        
+                        <div class="priorities-form" id="prioritiesForm">
+                            <!-- Priority 1 -->
+                            <div class="priority-item" data-priority="1">
+                                <div class="priority-header">
+                                    <span class="priority-number">1</span>
+                                    <label>Most Important Priority</label>
+                                </div>
+                                <div class="priority-input-group">
+                                    <input type="text" class="priority-input" id="priority1" placeholder="What's your #1 priority tomorrow?">
+                                    <select class="priority-category" id="category1">
+                                        <option value="">Category</option>
+                                        <option value="work">💼 Work</option>
+                                        <option value="personal">👤 Personal</option>
+                                        <option value="health">💪 Health</option>
+                                        <option value="creative">🎨 Creative</option>
+                                        <option value="relationships">❤️ Relationships</option>
+                                        <option value="learning">📚 Learning</option>
+                                    </select>
+                                </div>
+                                <div class="time-estimation">
+                                    <label>Estimated time needed:</label>
+                                    <div class="time-slider-container">
+                                        <input type="range" class="time-slider" id="time1" min="15" max="240" value="60" step="15">
+                                        <span class="time-display" id="timeDisplay1">1h 0m</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Priority 2 -->
+                            <div class="priority-item" data-priority="2">
+                                <div class="priority-header">
+                                    <span class="priority-number">2</span>
+                                    <label>Second Priority</label>
+                                </div>
+                                <div class="priority-input-group">
+                                    <input type="text" class="priority-input" id="priority2" placeholder="What's your #2 priority tomorrow?">
+                                    <select class="priority-category" id="category2">
+                                        <option value="">Category</option>
+                                        <option value="work">💼 Work</option>
+                                        <option value="personal">👤 Personal</option>
+                                        <option value="health">💪 Health</option>
+                                        <option value="creative">🎨 Creative</option>
+                                        <option value="relationships">❤️ Relationships</option>
+                                        <option value="learning">📚 Learning</option>
+                                    </select>
+                                </div>
+                                <div class="time-estimation">
+                                    <label>Estimated time needed:</label>
+                                    <div class="time-slider-container">
+                                        <input type="range" class="time-slider" id="time2" min="15" max="240" value="45" step="15">
+                                        <span class="time-display" id="timeDisplay2">45m</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Priority 3 -->
+                            <div class="priority-item" data-priority="3">
+                                <div class="priority-header">
+                                    <span class="priority-number">3</span>
+                                    <label>Third Priority</label>
+                                </div>
+                                <div class="priority-input-group">
+                                    <input type="text" class="priority-input" id="priority3" placeholder="What's your #3 priority tomorrow?">
+                                    <select class="priority-category" id="category3">
+                                        <option value="">Category</option>
+                                        <option value="work">💼 Work</option>
+                                        <option value="personal">👤 Personal</option>
+                                        <option value="health">💪 Health</option>
+                                        <option value="creative">🎨 Creative</option>
+                                        <option value="relationships">❤️ Relationships</option>
+                                        <option value="learning">📚 Learning</option>
+                                    </select>
+                                </div>
+                                <div class="time-estimation">
+                                    <label>Estimated time needed:</label>
+                                    <div class="time-slider-container">
+                                        <input type="range" class="time-slider" id="time3" min="15" max="240" value="30" step="15">
+                                        <span class="time-display" id="timeDisplay3">30m</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="smart-suggestions" id="smartSuggestions" style="display: none;">
+                            <h4>💡 Smart Suggestions</h4>
+                            <div class="suggestions-list" id="suggestionsList"></div>
+                        </div>
+
+                        <div class="priorities-actions">
+                            <button class="action-btn" id="savePriorities">Set Tomorrow's Priorities</button>
+                            <button class="action-btn secondary" id="clearPriorities">Clear All</button>
+                        </div>
+                        
+                        <div class="priorities-success" id="prioritiesSuccess" style="display: none;">
+                            <div class="success-message">
+                                <span class="success-icon">🎯</span>
+                                <h4>Tomorrow is Set for Success!</h4>
+                                <p>Your future self will thank you for this preparation.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Evening Checklist -->
+                <div class="routine-card">
+                    <div class="card-header">
+                        <h3>Evening Checklist</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="checklist">
+                            <label class="checklist-item">
+                                <input type="checkbox" id="phoneLocation">
+                                <span class="checkmark"></span>
+                                Phone placed away from bedroom
+                            </label>
+                            <label class="checklist-item">
+                                <input type="checkbox" id="environmentClean">
+                                <span class="checkmark"></span>
+                                Living space cleaned and organized
+                            </label>
+                            <label class="checklist-item">
+                                <input type="checkbox" id="clothesReady">
+                                <span class="checkmark"></span>
+                                Tomorrow's clothes laid out
+                            </label>
+                            <label class="checklist-item">
+                                <input type="checkbox" id="waterBottle">
+                                <span class="checkmark"></span>
+                                Water bottle filled and ready
+                            </label>
+                            <label class="checklist-item">
+                                <input type="checkbox" id="journalReady">
+                                <span class="checkmark"></span>
+                                Journal and pen accessible
+                            </label>
+                            <label class="checklist-item">
+                                <input type="checkbox" id="prioritiesSet">
+                                <span class="checkmark"></span>
+                                Tomorrow's top 3 priorities set
+                            </label>
+                        </div>
+                        <div class="sleep-quality-prediction">
+                            <h4>Sleep Quality Prediction</h4>
+                            <div class="quality-score" id="qualityScore">85%</div>
+                            <small>Based on preparation completion</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div id="analytics-tab" class="tab-content">
+                <div class="analytics-header">
+                    <h2>Progress Analytics</h2>
+                    <p>Track your routine optimization journey</p>
+                </div>
+
+                <!-- Key Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h3>Current Streak</h3>
+                        <div class="metric-value" id="analyticsStreak">0</div>
+                        <small>consecutive days</small>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Completion Rate</h3>
+                        <div class="metric-value" id="completionRate">0%</div>
+                        <small>last 7 days</small>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Best Time</h3>
+                        <div class="metric-value" id="bestTime">--:--</div>
+                        <small>routine completion</small>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Energy Level</h3>
+                        <div class="metric-value" id="avgEnergy">N/A</div>
+                        <small>average mood</small>
+                    </div>
+                </div>
+
+                <!-- Weekly Chart -->
+                <div class="routine-card">
+                    <div class="card-header">
+                        <h3>7-Day Progress</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="chart-container">
+                            <canvas id="progressChart" width="300" height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Priority Analytics -->
+                <div class="routine-card">
+                    <div class="card-header">
+                        <h3>Priority Performance Analytics</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="priority-metrics-grid">
+                            <div class="priority-metric">
+                                <h4>Overall Completion</h4>
+                                <div class="metric-value" id="priorityCompletionRate">0%</div>
+                                <small>last 7 days</small>
+                            </div>
+                            <div class="priority-metric">
+                                <h4>Planning Impact</h4>
+                                <div class="metric-value" id="planningImpact">+0%</div>
+                                <small>vs unplanned days</small>
+                            </div>
+                        </div>
+                        
+                        <div class="category-breakdown">
+                            <h4>Completion by Category</h4>
+                            <div class="category-stats" id="categoryStats">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <div class="priority-patterns">
+                            <h4>📊 Your Priority Patterns</h4>
+                            <div class="pattern-list" id="priorityPatterns">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insights -->
+                <div class="routine-card">
+                    <div class="card-header">
+                        <h3>Personalized Insights</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="insights-list" id="insightsList">
+                            <div class="insight-item">
+                                🧠 <strong>Neuroscience Tip:</strong> Your cortisol peaks 30-45 minutes after waking. Use this for challenging tasks!
+                            </div>
+                            <div class="insight-item">
+                                ⚡ <strong>Pattern Detected:</strong> You complete routines 73% faster on days you use the 5-4-3-2-1 method.
+                            </div>
+                            <div class="insight-item">
+                                🌤️ <strong>Weather Impact:</strong> Your energy is 20% higher on sunny days. Consider light therapy on cloudy mornings.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings-tab" class="tab-content">
+                <div class="settings-header">
+                    <h2>Settings & Customization</h2>
+                </div>
+
+                <!-- Personal Info -->
+                <div class="routine-card">
+                    <div class="card-header">
+                        <h3>Personal Preferences</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="setting-group">
+                            <label for="userName">Name:</label>
+                            <input type="text" id="userName" placeholder="Enter your name">
+                        </div>
+                        <div class="setting-group">
+                            <label for="timeZone">Time Zone:</label>
+                            <select id="timeZone">
+                                <option value="auto">Auto-detect</option>
+                                <option value="EST">Eastern (EST)</option>
+                                <option value="CST">Central (CST)</option>
+                                <option value="MST">Mountain (MST)</option>
+                                <option value="PST">Pacific (PST)</option>
+                            </select>
+                        </div>
+                        <div class="setting-group">
+                            <label for="location">Location (for weather):</label>
+                            <input type="text" id="location" placeholder="City, State or ZIP">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Settings -->
+                <div class="routine-card">
+                    <div class="card-header">
+                        <h3>Notifications</h3>
+                    </div>
+                    <div class="card-content">
+                        <label class="toggle-setting">
+                            <input type="checkbox" id="morningReminder" checked>
+                            <span class="toggle-slider"></span>
+                            Morning routine reminder
+                        </label>
+                        <label class="toggle-setting">
+                            <input type="checkbox" id="eveningReminder" checked>
+                            <span class="toggle-slider"></span>
+                            Evening prep reminder
+                        </label>
+                        <label class="toggle-setting">
+                            <input type="checkbox" id="streakCelebration" checked>
+                            <span class="toggle-slider"></span>
+                            Streak milestone celebrations
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Data Management -->
+                <div class="routine-card">
+                    <div class="card-header">
+                        <h3>Data Management</h3>
+                    </div>
+                    <div class="card-content">
+                        <button class="action-btn secondary" id="exportData">Export Data</button>
+                        <button class="action-btn secondary" id="importData">Import Data</button>
+                        <button class="action-btn danger" id="resetData">Reset All Data</button>
+                        <small>Your data is stored locally on your device for privacy.</small>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Success Modal -->
+        <div id="successModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalTitle">Congratulations! 🎉</h3>
+                </div>
+                <div class="modal-body">
+                    <p id="modalMessage">You've completed your morning routine!</p>
+                    <div class="celebration-animation">🌟</div>
+                </div>
+                <div class="modal-actions">
+                    <button class="action-btn" id="modalClose">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Service Worker Registration for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => console.log('SW registered'))
+                    .catch(error => console.log('SW registration failed'));
+            });
+        }
+    </script>
+</body>
+</html>
